@@ -1,0 +1,39 @@
+Dependencias
+
+node_modules/
+
+Entorno y Secretos (CRÍTICO para tu seguridad)
+
+.env
+.env.local
+.env.*.local
+
+Logs y Archivos temporales
+
+.log
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+
+Compilación y Salidas
+
+dist/
+build/
+out/
+.output/
+
+Sistema y IDEs
+
+.DS_Store
+.vscode/
+.idea/
+*.suo
+.ntvs
+*.njsproj
+*.sln
+*.swp
+
+Archivos de cobertura y reportes
+
+coverage/
+.nyc_output/

@@ -1,0 +1,266 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API La Tropical",
+      "version": "1.0.0",
+      "description": "Documentación de la API RESTful para la gestión de la charanga La Tropical. Desarrollada con Node.js, Express y MongoDB."
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000/api",
+        "description": "Servidor Local de Desarrollo"
+      }
+    ],
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT",
+          "description": "Introduce tu Token JWT aquí para acceder a las rutas privadas."
+        }
+      }
+    },
+    "paths": {
+      "/auth/register": {
+        "post": {
+          "summary": "Registrar un nuevo músico",
+          "tags": ["Autenticación"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string", "example": "Pablo" },
+                    "email": { "type": "string", "example": "pablo@latropical.com" },
+                    "instrument": { "type": "string", "example": "Trompeta" },
+                    "password": { "type": "string", "example": "123" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Músico registrado con éxito" },
+            "400": { "description": "El correo ya existe" }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "summary": "Inicia sesión en la API",
+          "tags": ["Autenticación"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string", "example": "pablo@latropical.com" },
+                    "password": { "type": "string", "example": "123" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Login exitoso. Devuelve el Token JWT." },
+            "401": { "description": "Credenciales inválidas." }
+          }
+        }
+      },
+      "/events": {
+        "get": {
+          "summary": "Obtener toda la agenda",
+          "tags": ["Eventos"],
+          "security": [{ "bearerAuth": [] }],
+          "responses": {
+            "200": { "description": "Lista de eventos devuelta con éxito." },
+            "401": { "description": "No autorizado. Falta el token." }
+          }
+        },
+        "post": {
+          "summary": "Crear un nuevo evento (Solo Admins)",
+          "tags": ["Eventos"],
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string", "example": "Fiestas de San Roque" },
+                    "date": { "type": "string", "example": "2026-08-16T23:30:00Z" },
+                    "is_paid": { "type": "boolean", "example": true },
+                    "base_price": { "type": "number", "example": 120 },
+                    "meeting_time_sede": { "type": "string", "example": "21:00" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Evento creado." },
+            "403": { "description": "Acceso denegado. Se requiere rol de Admin." }
+          }
+        }
+      },
+      "/events/{id}": {
+        "get": {
+          "summary": "Ver detalles y presupuesto de un evento",
+          "tags": ["Eventos"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Evento y presupuesto calculados devueltos." }
+          }
+        },
+        "put": {
+          "summary": "Editar un evento (Solo Admins)",
+          "tags": ["Eventos"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "base_price": { "type": "number", "example": 150 }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Evento actualizado." }
+          }
+        },
+        "delete": {
+          "summary": "Borrar un evento (Solo Admins)",
+          "tags": ["Eventos"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Evento borrado." }
+          }
+        }
+      },
+      "/events/{id}/apuntar": {
+        "post": {
+          "summary": "Apuntarse a un evento",
+          "tags": ["Eventos"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_car": { "type": "boolean", "example": true }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Te has apuntado con éxito." }
+          }
+        }
+      },
+      "/partituras": {
+        "get": {
+          "summary": "Obtener todo el archivo musical",
+          "tags": ["Partituras"],
+          "security": [{ "bearerAuth": [] }],
+          "responses": {
+            "200": { "description": "Lista de partituras devuelta." }
+          }
+        },
+        "post": {
+          "summary": "Añadir una partitura al archivo (Solo Admins)",
+          "tags": ["Partituras"],
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string", "example": "Paquito el Chocolatero" },
+                    "composer": { "type": "string", "example": "Gustavo Pascual Falcó" },
+                    "instrument": { "type": "string", "example": "Trompeta 1" },
+                    "difficulty": { "type": "number", "example": 2 }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Partitura añadida." }
+          }
+        }
+      },
+      "/partituras/{id}": {
+        "get": {
+          "summary": "Ver detalles de una partitura",
+          "tags": ["Partituras"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Partitura devuelta." }
+          }
+        },
+        "put": {
+          "summary": "Editar una partitura (Solo Admins)",
+          "tags": ["Partituras"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "difficulty": { "type": "number", "example": 3 }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Partitura actualizada." }
+          }
+        },
+        "delete": {
+          "summary": "Borrar una partitura (Solo Admins)",
+          "tags": ["Partituras"],
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          ],
+          "responses": {
+            "200": { "description": "Partitura borrada." }
+          }
+        }
+      }
+    }
+  }

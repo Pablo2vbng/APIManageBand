@@ -1,0 +1,45 @@
+Diagrama
+   
+    USER {
+        ObjectId _id PK
+        String name
+        String email "UNIQUE"
+        String phone "Opcional"
+        String instrument "Opcional"
+        String role "ENUM: 'admin', 'user'"
+        String password "Hash Bcrypt"
+        Date createdAt
+        Date updatedAt
+    }
+
+    EVENT {
+        ObjectId _id PK
+        String title
+        String description "Opcional"
+        Date date
+        Boolean is_paid
+        Number base_price
+        String meeting_time_sede
+        Array convocados "Sub-documentos embebidos"
+        Date createdAt
+        Date updatedAt
+    }
+
+    CONVOCADO {
+        ObjectId userId FK "Referencia a USER" Embevido en Evento
+        Boolean has_car
+        Number price_modifier
+    }
+
+    PARTITURA {
+        ObjectId _id PK
+        String title
+        String composer
+        String instrument
+        Number difficulty "MIN: 1, MAX: 5"
+        String pdf_url "Opcional"
+        Date createdAt
+        Date updatedAt
+    }
+
+   
